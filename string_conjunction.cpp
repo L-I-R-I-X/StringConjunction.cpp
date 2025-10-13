@@ -1,73 +1,94 @@
 #include <iostream>
-#include <cstring>
+#include <string>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
-int main() {
-    const int SIZE = 8;
-    char str1[SIZE + 1] = {'\0'}; // +1 для нуль-терминатора
-    char str2[SIZE + 1] = {'\0'};
-    char result[SIZE + 1] = {'\0'};
-    char temp1[100], temp2[100];
+const int SIZE = 8;
+const string inPromptTemplate = "Введите {N}-ую строку\n";
+const string outPromptTemplate = "{N}-ая строка (с нулями)";
+const string outPromptRes = "Результат";
 
-    // Ввод первой строки
-    cin >> temp1;
-    
-    // Проверка первой строки
-    if (strlen(temp1) > SIZE) {
-        cout << "Строка не должна превышать 8 символов!" << endl;
-        return 1;
+string inputString(int n) {
+    string prompt = inPromptTemplate;
+    // Находим маркер {N}
+    size_t pos = prompt.find("{N}");
+    if (pos != string::npos) {
+        // Заменяем {N} на номер строки
+        prompt.replace(pos, 3, to_string(n));
     }
-    for (int i = 0; i < strlen(temp1); ++i) {
-        if (temp1[i] != '0' && temp1[i] != '1') {
-            cout << "Строка должна содержать только '0' и '1'." << endl;
-            return 1;
+    cout << prompt;
+    string input;
+    cin >> input;
+    return input;
+}
+
+bool checkString(const string& str) {
+    if (str.length() > SIZE) {
+        cout << "Длина строки не должна превышать " << SIZE << " символов!\n";
+        return false;
+    }
+    for (char c : str) {
+        if (c != '0' && c != '1') {
+            cout << "Строка должна содержать только '0' и '1'.\n";
+            return false;
         }
     }
-    
-    // Дополнение первой строки нулями
-    int zeros_to_add = SIZE - strlen(temp1);
-    for (int i = 0; i < zeros_to_add; ++i) {
-        str1[i] = '0';
-    }
-    for (int i = zeros_to_add; i < SIZE; ++i) {
-        str1[i] = temp1[i - zeros_to_add];
-    }
-    str1[SIZE] = '\0';
+    return true;
+}
 
-    // Ввод и проверка второй строки (аналогично)
-    cin >> temp2;
-    if (strlen(temp2) > SIZE) {
-        cout << "Строка не должна превышать 8 символов!" << endl;
-        return 1;
+string aadZeros(const string& str) {
+    if (str.length() < SIZE) {
+        cout << "Длина строки менее " << SIZE << " символов\n";
+        cout << "Будет выполнено дополнение незначащими нулями\n";
+        int zeros_to_add = SIZE - str.length();
+        string zeros(zeros_to_add, '0');
+        return zeros + str;
     }
-    for (int i = 0; i < strlen(temp2); ++i) {
-        if (temp2[i] != '0' && temp2[i] != '1') {
-            cout << "Строка должна содержать только '0' и '1'." << endl;
-            return 1;
-        }
-    }
-    
-    // Дополнение второй строки нулями
-    zeros_to_add = SIZE - strlen(temp2);
-    for (int i = 0; i < zeros_to_add; ++i) {
-        str2[i] = '0';
-    }
-    for (int i = zeros_to_add; i < SIZE; ++i) {
-        str2[i] = temp2[i - zeros_to_add];
-    }
-    str2[SIZE] = '\0';
+    return str;
+}
 
-    // Конъюнкция
+string conjunction(const string& str1, const string& str2) {
+    string result = "";
     for (int i = 0; i < SIZE; ++i) {
-        result[i] = (str1[i] == '1' && str2[i] == '1') ? '1' : '0';
+        result += (str1[i] == '1' && str2[i] == '1') ? '1' : '0';
     }
-    result[SIZE] = '\0';
+    return result;
+}
 
-    // Вывод (требование 6)
-    cout << "Первая строка (с нулями): " << str1 << endl;
-    cout << "Вторая строка (с нулями): " << str2 << endl;
-    cout << "Результат: " << result << endl;
+void outputString(const string& str, int n) {
+    string prompt_text = outPromptTemplate;
+    size_t pos = prompt_text.find("{N}");
+    if (pos != string::npos) {
+        prompt_text.replace(pos, 3, to_string(n));
+    }
+    cout << prompt_text << "\n";
+    cout << str << "\n";
+}
+
+void outputRes(const string& res) {
+    cout << outPromptRes << ": " << res << "\n";
+}
+
+int main() {
+    string temp1 = inputString(1);
+    while (!checkString(temp1)) {
+        temp1 = inputString(1);
+    }
+    string str1 = aadZeros(temp1);
+
+    string temp2 = inputString(2);
+    while (!checkString(temp2)) {
+        temp2 = inputString(2);
+    }
+    string str2 = aadZeros(temp2);
+
+    string res = conjunction(str1, str2);
+
+    outputString(str1, 1);
+    outputString(str2, 2);
+    outputRes(res);
 
     return 0;
 }
