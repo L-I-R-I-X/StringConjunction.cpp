@@ -1,6 +1,7 @@
 #include "string_conjunction.h"
 #include <iostream>
 #include <string>
+#include <stdexcept>
 
 BitString::BitString() : size(8) {
     bs = new char[size];
@@ -27,14 +28,12 @@ BitString::~BitString() {
 
 void BitString::fromString(const std::string& inputString) {
     if (inputString.length() > size) {
-        std::cout << "Длина строки не должна превышать " << size << " символов!\n";
-        return;
+        throw std::invalid_argument("Длина строки не должна превышать " + std::to_string(size) + " символов!");
     }
     
     for (char c : inputString) {
         if (c != '0' && c != '1') {
-            std::cout << "Строка должна содержать только '0' и '1'.\n";
-            return;
+            throw std::invalid_argument("Строка должна содержать только '0' и '1'.");
         }
     }
 
@@ -67,6 +66,10 @@ void BitString::output(int n) const {
 }
 
 BitString BitString::conjunction(const BitString& other) const {
+    if (size != other.size) {
+        throw std::invalid_argument("Размеры битовых строк должны совпадать для операции конъюнкции.");
+    }
+    
     BitString result;
     for (int i = 0; i < size; ++i) {
         result.bs[i] = (bs[i] == '1' && other.bs[i] == '1') ? '1' : '0';
@@ -77,9 +80,10 @@ BitString BitString::conjunction(const BitString& other) const {
 BitString& BitString::operator=(const BitString& other) {
     if (this == &other) return *this;
     
-    delete[] bs;
-    size = other.size;
-    bs = new char[size];
+    if (size != other.size) {
+        throw std::invalid_argument("Размеры битовых строк должны совпадать для присваивания.");
+    }
+    
     for (int i = 0; i < size; i++) {
         bs[i] = other.bs[i];
     }
