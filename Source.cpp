@@ -3,30 +3,30 @@
 #include <string>
 #include <stdexcept>
 
-BitString::BitString() : size(8) {
+BitStringBase::BitStringBase() : size(8) {
     bs = new char[size];
     for (int i = 0; i < size; i++) {
         bs[i] = '0';
     }
 }
 
-BitString::BitString(const std::string& inputString) : size(8) {
+BitStringBase::BitStringBase(const std::string& inputString) : size(8) {
     bs = new char[size];
     fromString(inputString);
 }
 
-BitString::BitString(const BitString& other) : size(other.size) {
+BitStringBase::BitStringBase(const BitStringBase& other) : size(other.size) {
     bs = new char[size];
     for (int i = 0; i < size; i++) {
         bs[i] = other.bs[i];
     }
 }
 
-BitString::~BitString() {
+BitStringBase::~BitStringBase() {
     delete[] bs;
 }
 
-void BitString::fromString(const std::string& inputString) {
+void BitStringBase::fromString(const std::string& inputString) {
     if (inputString.length() > static_cast<size_t>(size)) {
         throw std::invalid_argument("String length must not exceed " + std::to_string(size) + " characters!");
     }
@@ -49,7 +49,21 @@ void BitString::fromString(const std::string& inputString) {
     }
 }
 
-void BitString::input(int n) {
+char& BitStringBase::getChar(int index) {
+    if (index < 0 || index >= size) {
+        throw std::out_of_range("Index out of range");
+    }
+    return bs[index];
+}
+
+const char& BitStringBase::getChar(int index) const {
+    if (index < 0 || index >= size) {
+        throw std::out_of_range("Index out of range");
+    }
+    return bs[index];
+}
+
+void BitStringIO::input(int n) {
     std::string prompt = "Enter " + std::to_string(n) + " string\n";
     std::cout << prompt;
     std::string userInput;
@@ -57,23 +71,37 @@ void BitString::input(int n) {
     fromString(userInput);
 }
 
-void BitString::output(int n) const {
+void BitStringIO::output(int n) const {
     std::string promptText = std::to_string(n) + " string (with zeros)\n";
     std::cout << promptText;
-    for (int i = 0; i < size; i++) {
-        std::cout << bs[i];
+    for (int i = 0; i < getSize(); i++) {
+        std::cout << getChar(i);
     }
     std::cout << "\n";
 }
 
+std::ostream& operator<<(std::ostream& os, const BitStringIO& bitStr) {
+    for (int i = 0; i < bitStr.getSize(); i++) {
+        os << bitStr.getChar(i);
+    }
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, BitStringIO& bitStr) {
+    std::string input;
+    is >> input;
+    bitStr.setFromString(input);
+    return is;
+}
+
 BitString BitString::conjunction(const BitString& other) const {
-    if (size != other.size) {
+    if (getSize() != other.getSize()) {
         throw std::invalid_argument("BitString sizes must be equal for conjunction.");
     }
     
     BitString result;
-    for (int i = 0; i < size; ++i) {
-        result.bs[i] = (bs[i] == '1' && other.bs[i] == '1') ? '1' : '0';
+    for (int i = 0; i < getSize(); ++i) {
+        result.getChar(i) = (getChar(i) == '1' && other.getChar(i) == '1') ? '1' : '0';
     }
     return result;
 }
@@ -81,12 +109,12 @@ BitString BitString::conjunction(const BitString& other) const {
 BitString& BitString::operator=(const BitString& other) {
     if (this == &other) return *this;
     
-    if (size != other.size) {
+    if (getSize() != other.getSize()) {
         throw std::invalid_argument("BitString sizes must be equal for assignment.");
     }
     
-    for (int i = 0; i < size; i++) {
-        bs[i] = other.bs[i];
+    for (int i = 0; i < getSize(); i++) {
+        getChar(i) = other.getChar(i);
     }
     return *this;
 }
@@ -96,29 +124,9 @@ BitString BitString::operator&(const BitString& other) const {
 }
 
 char& BitString::operator[](int index) {
-    if (index < 0 || index >= size) {
-        throw std::out_of_range("Index out of range");
-    }
-    return bs[index];
+    return getChar(index);
 }
 
 const char& BitString::operator[](int index) const {
-    if (index < 0 || index >= size) {
-        throw std::out_of_range("Index out of range");
-    }
-    return bs[index];
-}
-
-std::ostream& operator<<(std::ostream& os, const BitString& bitStr) {
-    for (int i = 0; i < bitStr.size; i++) {
-        os << bitStr.bs[i];
-    }
-    return os;
-}
-
-std::istream& operator>>(std::istream& is, BitString& bitStr) {
-    std::string input;
-    is >> input;
-    bitStr.fromString(input);
-    return is;
+    return getChar(index);
 }
