@@ -27,7 +27,7 @@ BitString::~BitString() {
 }
 
 void BitString::fromString(const std::string& inputString) {
-    if (inputString.length() > size) {
+    if (inputString.length() > static_cast<size_t>(size)) {
         throw std::invalid_argument("String length must not exceed " + std::to_string(size) + " characters!");
     }
     
@@ -37,7 +37,7 @@ void BitString::fromString(const std::string& inputString) {
         }
     }
 
-    int inputLength = inputString.length();
+    int inputLength = static_cast<int>(inputString.length());
     int padding = size - inputLength;
     
     for (int i = 0; i < padding; i++) {
@@ -89,4 +89,36 @@ BitString& BitString::operator=(const BitString& other) {
         bs[i] = other.bs[i];
     }
     return *this;
+}
+
+BitString BitString::operator&(const BitString& other) const {
+    return this->conjunction(other);
+}
+
+char& BitString::operator[](int index) {
+    if (index < 0 || index >= size) {
+        throw std::out_of_range("Index out of range");
+    }
+    return bs[index];
+}
+
+const char& BitString::operator[](int index) const {
+    if (index < 0 || index >= size) {
+        throw std::out_of_range("Index out of range");
+    }
+    return bs[index];
+}
+
+std::ostream& operator<<(std::ostream& os, const BitString& bitStr) {
+    for (int i = 0; i < bitStr.size; i++) {
+        os << bitStr.bs[i];
+    }
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, BitString& bitStr) {
+    std::string input;
+    is >> input;
+    bitStr.fromString(input);
+    return is;
 }
