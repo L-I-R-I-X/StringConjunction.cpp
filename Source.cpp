@@ -37,12 +37,15 @@ void BitString::fromString(const std::string& inputString) {
         }
     }
 
-    int i = 0;
-    for (; i < inputString.length(); i++) {
-        bs[i] = inputString[i];
-    }
-    for (; i < size; i++) {
+    int inputLength = inputString.length();
+    int padding = size - inputLength;
+    
+    for (int i = 0; i < padding; i++) {
         bs[i] = '0';
+    }
+    
+    for (int i = 0; i < inputLength; i++) {
+        bs[padding + i] = inputString[i];
     }
 }
 
