@@ -28,28 +28,26 @@ BitString::~BitString() {
 
 void BitString::fromString(const std::string& inputString) {
     if (inputString.length() > size) {
-        throw std::invalid_argument("Длина строки не должна превышать " + std::to_string(size) + " символов!");
+        throw std::invalid_argument("String length must not exceed " + std::to_string(size) + " characters!");
     }
     
     for (char c : inputString) {
         if (c != '0' && c != '1') {
-            throw std::invalid_argument("Строка должна содержать только '0' и '1'.");
+            throw std::invalid_argument("String must contain only '0' and '1'.");
         }
     }
 
-    // Заполняем битовую строку
     int i = 0;
     for (; i < inputString.length(); i++) {
         bs[i] = inputString[i];
     }
-    // Дополняем нулями если нужно
     for (; i < size; i++) {
         bs[i] = '0';
     }
 }
 
 void BitString::input(int n) {
-    std::string prompt = "Введите " + std::to_string(n) + "-ую строку\n";
+    std::string prompt = "Enter " + std::to_string(n) + " string\n";
     std::cout << prompt;
     std::string userInput;
     std::cin >> userInput;
@@ -57,7 +55,7 @@ void BitString::input(int n) {
 }
 
 void BitString::output(int n) const {
-    std::string promptText = std::to_string(n) + "-ая строка (с нулями)\n";
+    std::string promptText = std::to_string(n) + " string (with zeros)\n";
     std::cout << promptText;
     for (int i = 0; i < size; i++) {
         std::cout << bs[i];
@@ -67,7 +65,7 @@ void BitString::output(int n) const {
 
 BitString BitString::conjunction(const BitString& other) const {
     if (size != other.size) {
-        throw std::invalid_argument("Размеры битовых строк должны совпадать для операции конъюнкции.");
+        throw std::invalid_argument("BitString sizes must be equal for conjunction.");
     }
     
     BitString result;
@@ -81,7 +79,7 @@ BitString& BitString::operator=(const BitString& other) {
     if (this == &other) return *this;
     
     if (size != other.size) {
-        throw std::invalid_argument("Размеры битовых строк должны совпадать для присваивания.");
+        throw std::invalid_argument("BitString sizes must be equal for assignment.");
     }
     
     for (int i = 0; i < size; i++) {
