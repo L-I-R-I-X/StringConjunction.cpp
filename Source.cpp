@@ -49,6 +49,10 @@ void BitStringBase::fromString(const std::string& inputString) {
     }
 }
 
+void BitStringBase::setFromString(const std::string& inputString) {
+    fromString(inputString);
+}
+
 char& BitStringBase::getChar(int index) {
     if (index < 0 || index >= size) {
         throw std::out_of_range("Index out of range");
@@ -62,6 +66,15 @@ const char& BitStringBase::getChar(int index) const {
     }
     return bs[index];
 }
+
+int BitStringBase::getSize() const {
+    return size;
+}
+
+BitStringIO::BitStringIO() : BitStringBase() {}
+BitStringIO::BitStringIO(const std::string& inputString) : BitStringBase(inputString) {}
+BitStringIO::BitStringIO(const BitStringIO& other) : BitStringBase(other) {}
+BitStringIO::~BitStringIO() {}
 
 void BitStringIO::input(int n) {
     std::string prompt = "Enter " + std::to_string(n) + " string\n";
@@ -93,6 +106,11 @@ std::istream& operator>>(std::istream& is, BitStringIO& bitStr) {
     bitStr.setFromString(input);
     return is;
 }
+
+BitString::BitString() : BitStringIO() {}
+BitString::BitString(const std::string& inputString) : BitStringIO(inputString) {}
+BitString::BitString(const BitString& other) : BitStringIO(other) {}
+BitString::~BitString() {}
 
 BitString BitString::conjunction(const BitString& other) const {
     if (getSize() != other.getSize()) {
