@@ -1,53 +1,38 @@
-[string_conjunction.h]
-#ifndef STRING_CONJUNCTION_H
-#define STRING_CONJUNCTION_H
-
-#include <string>
+#include "string_conjunction.h"
 #include <iostream>
+#include <stdexcept>
 
-class BitStringBase {
-protected:
-    char* bs;
-    int size;
-
-    void fromString(const std::string& inputString);
-
-public:
-    BitStringBase();
-    BitStringBase(const std::string& inputString);
-    BitStringBase(const BitStringBase& other);
-    virtual ~BitStringBase();
-
-    char& getChar(int index);
-    const char& getChar(int index) const;
-    int getSize() const { return size; }
-};
-
-class BitStringIO : public BitStringBase {
-public:
-    using BitStringBase::BitStringBase;
-
-    void input(int n);
-    void output(int n) const;
-    
-    void setFromString(const std::string& inputString) {
-        fromString(inputString);
+int main() {
+    try {
+        BitString a, b;
+        
+        // Ввод с помощью оператора >>
+        std::cout << "Enter 1 string: ";
+        std::cin >> a;
+        std::cout << "Enter 2 string: ";
+        std::cin >> b;
+        
+        // Конъюнкция с помощью оператора &
+        BitString c = a & b;
+        
+        // Вывод с помощью оператора <<
+        std::cout << "1 string (with zeros): " << a << std::endl;
+        std::cout << "2 string (with zeros): " << b << std::endl;
+        std::cout << "Result: " << c << std::endl;
+        
+        // Демонстрация оператора []
+        std::cout << "First character of result: " << c[0] << std::endl;
+        c[0] = '1'; // Изменение значения через оператор []
+        std::cout << "Modified result: " << c << std::endl;
+        
+        // Демонстрация метода conjunction (старый способ)
+        BitString d = a.conjunction(b);
+        std::cout << "Using conjunction method: " << d << std::endl;
     }
-};
-
-std::ostream& operator<<(std::ostream& os, const BitStringIO& bitStr);
-std::istream& operator>>(std::istream& is, BitStringIO& bitStr);
-
-class BitString : public BitStringIO {
-public:
-    using BitStringIO::BitStringIO;
-
-    BitString conjunction(const BitString& other) const;
+    catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
     
-    BitString& operator=(const BitString& other);
-    BitString operator&(const BitString& other) const;
-    char& operator[](int index);
-    const char& operator[](int index) const;
-};
-
-#endif
+    return 0;
+}
